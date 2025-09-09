@@ -54,9 +54,9 @@ python3 test_key.py
 
 
 
+---
 
-
- 🧪 Example Prompts
+## 🧪 Example Prompts
 
 Top 5 countries by revenue
 
@@ -66,6 +66,7 @@ List the 10 longest tracks with album names
 
 Total revenue by year, descending
 
+---
 
 ## 📂 Project Structure
 
@@ -79,6 +80,8 @@ nl2sql-assistant/
 ├─ .env.example            # Template for secrets
 └─ .gitignore              # Keeps .env & DB out of git
 
+---
+
 ## 🔑 Environment
 
 Create .env in the project root:
@@ -88,6 +91,8 @@ OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
 Tip: If a shell variable is overriding your file while testing, run:
 
 unset OPENAI_API_KEY
+
+---
 
 ## 🧰 Troubleshooting
 
@@ -103,6 +108,7 @@ no such table: ...
 Use exact Chinook table names (singular, capitalized):
 Customer, Invoice, InvoiceLine, Track, etc.
 
+---
 
 ## 🛠 Tech Stack
 
@@ -114,6 +120,7 @@ OpenAI Python SDK
 
 python-dotenv, tabulate
 
+---
 
 ## 📌 Roadmap
 
