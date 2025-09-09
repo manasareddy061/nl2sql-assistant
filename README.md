@@ -21,32 +21,42 @@ This project demonstrates **Agentic AI + LLMs** for database query automation. P
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/manasareddy061/nl2sql-assistant.git
-cd nl2sql-assistant```
-
-### 2) Python env + deps
-```python3 -m venv .venv
+cd nl2sql-assistant
+2. Create a virtual environment
+bash
+Copy code
+python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt```
+3. Install dependencies
+bash
+Copy code
+pip install -r requirements.txt
+4. Configure environment variables
+Create a .env file in the root with your OpenAI key:
 
-### 3) Get the Chinook database (kept out of Git)
-git clone https://github.com/lerocha/chinook-database.git
-cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite .
+ini
+Copy code
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
+Unset any shell variable that might override:
 
-### 4) API key
-cp .env.example .env
-nano .env         # set: OPENAI_API_KEY=sk-... (your real key)
+bash
+Copy code
+unset OPENAI_API_KEY
+5. Run database tests
+bash
+Copy code
+python3 test_db.py
+python3 test_sqlalchemy.py
+6. Verify OpenAI API key
+bash
+Copy code
+python3 test_key.py
 
-### 5) Sanity tests
-python3 test_db.py          # sqlite: list tables, sample queries
-python3 test_sqlalchemy.py  # sqlalchemy: sample joins
-python3 test_key.py         # OpenAI API key check
-
-### 6) Run the NL→SQL assistant
-python3 nl2sql.py
 
 
 
-## 🧪 Example Prompts
+
+ 🧪 Example Prompts
 
 Top 5 countries by revenue
 
