@@ -23,30 +23,30 @@ This project demonstrates **Agentic AI + LLMs** for database query automation. P
 git clone https://github.com/manasareddy061/nl2sql-assistant.git
 cd nl2sql-assistant
 
-# 2) Python env + deps
+### 2) Python env + deps
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-# 3) Get the Chinook database (kept out of Git)
+### 3) Get the Chinook database (kept out of Git)
 git clone https://github.com/lerocha/chinook-database.git
 cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite .
 
-# 4) API key
+### 4) API key
 cp .env.example .env
 nano .env         # set: OPENAI_API_KEY=sk-... (your real key)
 
-# 5) Sanity tests
+### 5) Sanity tests
 python3 test_db.py          # sqlite: list tables, sample queries
 python3 test_sqlalchemy.py  # sqlalchemy: sample joins
 python3 test_key.py         # OpenAI API key check
 
-# 6) Run the NL→SQL assistant
+### 6) Run the NL→SQL assistant
 python3 nl2sql.py
 
 
 
-🧪 Example Prompts
+## 🧪 Example Prompts
 
 Top 5 countries by revenue
 
@@ -57,7 +57,7 @@ List the 10 longest tracks with album names
 Total revenue by year, descending
 
 
-📂 Project Structure
+## 📂 Project Structure
 
 
 nl2sql-assistant/
@@ -69,7 +69,7 @@ nl2sql-assistant/
 ├─ .env.example            # Template for secrets
 └─ .gitignore              # Keeps .env & DB out of git
 
-🔑 Environment
+## 🔑 Environment
 
 Create .env in the project root:
 
@@ -79,7 +79,7 @@ Tip: If a shell variable is overriding your file while testing, run:
 
 unset OPENAI_API_KEY
 
-🧰 Troubleshooting
+## 🧰 Troubleshooting
 
 Incorrect API key provided: sk-REPLACE_ME
 Update .env with your real key and unset OPENAI_API_KEY, then re-run python3 test_key.py.
@@ -94,7 +94,7 @@ Use exact Chinook table names (singular, capitalized):
 Customer, Invoice, InvoiceLine, Track, etc.
 
 
-🛠 Tech Stack
+## 🛠 Tech Stack
 
 Python 3.10+
 
@@ -105,7 +105,7 @@ OpenAI Python SDK
 python-dotenv, tabulate
 
 
-📌 Roadmap
+## 📌 Roadmap
 
 Multi-question chat loop with history
 
