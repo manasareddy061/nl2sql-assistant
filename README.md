@@ -21,12 +21,12 @@ This project demonstrates **Agentic AI + LLMs** for database query automation. P
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/manasareddy061/nl2sql-assistant.git
-cd nl2sql-assistant
+cd nl2sql-assistant```
 
 ### 2) Python env + deps
-python3 -m venv .venv
+```python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements.txt```
 
 ### 3) Get the Chinook database (kept out of Git)
 git clone https://github.com/lerocha/chinook-database.git
