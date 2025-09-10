@@ -132,8 +132,6 @@ cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite
 
 ## 📌 Roadmap
 
-- Multi-question chat loop with history  
-- CSV/Markdown export of results  
 - Streamlit UI  
 - Support for Postgres/MySQL  
 
