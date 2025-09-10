@@ -23,7 +23,7 @@ git clone https://github.com/manasareddy061/nl2sql-assistant.git
 cd nl2sql-assistant
 
 
-### 2. Create a virtual environment
+` ### 2)` Create a virtual environment
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
