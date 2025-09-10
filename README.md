@@ -17,14 +17,45 @@ This project demonstrates **Agentic AI + LLMs** for database query automation. P
 ---
 
 ## ⚙️ Setup Instruction
+
 ### 1) Clone the repository
-```bash
+~~~bash
 git clone https://github.com/manasareddy061/nl2sql-assistant.git
 cd nl2sql-assistant
----
+~~~
 
 ### 2) Create a virtual environment
-```bash
+~~~bash
 python3 -m venv .venv
-source .venv/bin/activate
----
+source .venv/bin/activate    # Windows: .venv\Scripts\activate
+~~~
+
+### 3) Install dependencies
+~~~bash
+pip install -r requirements.txt
+~~~
+
+### 4) Configure environment variables
+Create a `.env` file in the root with your OpenAI key:
+
+~~~ini
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx
+DATABASE_URL=sqlite:///chinook.db
+~~~
+
+Unset any shell variable that might override:
+~~~bash
+unset OPENAI_API_KEY
+~~~
+
+### 5) Run quick connectivity checks
+~~~bash
+python3 test_db.py
+python3 test_sqlalchemy.py
+~~~
+
+### 6) Verify OpenAI API key
+~~~bash
+python3 test_key.py
+~~~
+
