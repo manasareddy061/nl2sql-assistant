@@ -11,8 +11,10 @@ This project demonstrates **Agentic AI + LLMs** for database query automation.
 - Executes queries directly on the **Chinook SQLite** dataset
 - Results displayed in clean, tabulated format
 - **Explanations** generated for every query
+- **Multi-question interactive chat loop with history
+- **Exports each run to `.sql` + `.md` (and optionally `.csv`)**  
 - Secrets handled via `.env` (never exposed in GitHub)
-- Ready for extension into **Streamlit UI** or CSV/Markdown exports
+- Ready for extension into **Streamlit UI** or other UIs
 
 ---
 
@@ -73,13 +75,15 @@ python3 test_key.py
 ## 📂 Project Structure
 ~~~text
 nl2sql-assistant/
-├─ nl2sql.py               # NL → SQL assistant (uses OpenAI)
+├─ nl2sql.py               # NL → SQL assistant (uses OpenAI, supports history + exports)
 ├─ test_db.py              # Raw sqlite checks
 ├─ test_sqlalchemy.py      # SQLAlchemy demo queries
 ├─ test_key.py             # API key verification
 ├─ requirements.txt        # Dependencies
 ├─ .env.example            # Template for secrets
-└─ .gitignore              # Keeps .env & DB out of git
+├─ .gitignore              # Keeps .env, outputs/, and DB out of git
+├─ outputs/                # Auto-saved query results (.sql + .md, ignored in Git)
+└─ sample_outputs.zip      # Curated sample outputs (for demo in GitHub)
 ~~~
 
 ---
