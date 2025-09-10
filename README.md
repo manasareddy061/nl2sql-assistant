@@ -11,7 +11,7 @@ This project demonstrates **Agentic AI + LLMs** for database query automation.
 - Executes queries directly on the **Chinook SQLite** dataset
 - Results displayed in clean, tabulated format
 - **Explanations** generated for every query
-- **Multi-question interactive chat loop with history
+- Multi-question interactive chat loop with history
 - **Exports each run to `.sql` + `.md` (and optionally `.csv`)**  
 - Secrets handled via `.env` (never exposed in GitHub)
 - Ready for extension into **Streamlit UI** or other UIs
