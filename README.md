@@ -59,3 +59,80 @@ python3 test_sqlalchemy.py
 python3 test_key.py
 ~~~
 
+---
+
+## 🧪 Example Prompts
+
+- Top 5 countries by revenue  
+- Which customers placed the most invoices?  
+- List the 10 longest tracks with album names  
+- Total revenue by year, descending  
+
+---
+
+## 📂 Project Structure
+~~~text
+nl2sql-assistant/
+├─ nl2sql.py               # NL → SQL assistant (uses OpenAI)
+├─ test_db.py              # Raw sqlite checks
+├─ test_sqlalchemy.py      # SQLAlchemy demo queries
+├─ test_key.py             # API key verification
+├─ requirements.txt        # Dependencies
+├─ .env.example            # Template for secrets
+└─ .gitignore              # Keeps .env & DB out of git
+~~~
+
+---
+
+## 🔑 Environment
+
+Create a `.env` file in the project root:
+
+~~~ini
+OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxx
+~~~
+
+Tip: If a shell variable is overriding your file while testing, run:
+
+~~~bash
+unset OPENAI_API_KEY
+~~~
+
+---
+
+## 🧰 Troubleshooting
+
+**Incorrect API key provided: `sk-REPLACE_ME`**  
+Update `.env` with your real key and unset `OPENAI_API_KEY`, then re-run:
+~~~bash
+python3 test_key.py
+~~~
+
+**Chinook_Sqlite.sqlite not found**  
+Ensure you copied the DB into the project root:
+~~~bash
+cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite .
+~~~
+
+**no such table: ...**  
+Use exact Chinook table names (singular, capitalized):  
+`Customer`, `Invoice`, `InvoiceLine`, `Track`, etc.
+
+---
+
+## 🛠 Tech Stack
+
+- Python 3.10+  
+- SQLite, SQLAlchemy  
+- OpenAI Python SDK  
+- python-dotenv, tabulate  
+
+---
+
+## 📌 Roadmap
+
+- Multi-question chat loop with history  
+- CSV/Markdown export of results  
+- Streamlit UI  
+- Support for Postgres/MySQL  
+
