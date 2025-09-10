@@ -3,6 +3,10 @@ import os, re, sqlite3, textwrap, json
 from pathlib import Path
 from tabulate import tabulate
 from dotenv import load_dotenv
+try:
+    import readline  
+except Exception:
+    pass
 
 # ---- CONFIG ----
 DB_PATH = Path("Chinook_Sqlite.sqlite")
@@ -105,46 +109,62 @@ def main():
         schema_txt = schema_as_text(schema)
         print("Loaded schema:")
         print(textwrap.indent(schema_txt, "  "))
-        print("\nAsk a question (e.g., 'Top 5 countries by revenue', "
+        print("\nAsk questions (e.g., 'Top 5 countries by revenue', "
               "'Which albums have the most tracks?', 'Total revenue by year').")
-        question = input("\nYour question: ").strip()
-        if not question:
-            print("No question provided. Exiting.")
-            return
+        print("Type 'exit' or 'quit' to stop.\n")
 
-        sql = llm_sql(question, schema_txt)
-        print("\n--- Generated SQL ---")
-        print(sql)
+        while True:
+            question = input("\nYour question: ").strip()
+            if question.lower() in {"exit", "quit", "q"}:
+                print("Exiting. Goodbye!")
+                break
+            if not question:
+                print("No question provided. Try again.")
+                continue
 
-        if not is_safe_select(sql):
-            print("\n[BLOCKED] The generated SQL is not a single safe SELECT statement.")
-            return
+            # ---- generate SQL from LLM ----
+            sql = llm_sql(question, schema_txt)
+            print("\n--- Generated SQL ---")
+            print(sql)
 
-        # Optional confirmation
-        ok = input("\nRun this query? [Y/n]: ").strip().lower()
-        if ok and ok != "y":
-            print("Canceled.")
-            return
+            # ---- safety check ----
+            if not is_safe_select(sql):
+                print("\n[BLOCKED] The generated SQL is not a single safe SELECT statement.")
+                continue
 
-        cols, rows = run_query(conn, sql)
-        print("\n--- Results ---")
-        if rows:
-            print(tabulate(rows, headers=cols, tablefmt="github"))
-        else:
-            print("(no rows)")
+            # ---- confirm & run ----
+            ok = input("\nRun this query? [Y/n]: ").strip().lower()
+            if ok and ok != "y":
+                print("Canceled.")
+                continue
 
-        # Short explanation
-        try:
-            expl = explain_results(question, sql, rows[:5], schema_txt)
-            if expl:
-                print("\n--- Explanation ---")
-                print(expl)
-        except Exception as _e:
-            pass
+            cols, rows = run_query(conn, sql)
+            print("\n--- Results ---")
+            if rows:
+                print(tabulate(rows, headers=cols, tablefmt="github"))
+            else:
+                print("(no rows)")
+
+            # ---- brief explanation ----
+            try:
+                expl = explain_results(question, sql, rows[:5], schema_txt)
+                if expl:
+                    print("\n--- Explanation ---")
+                    print(expl)
+            except Exception:
+                # explanation is optional; ignore failures
+                pass
+
+            # loop continues automatically for the next question
 
     finally:
         conn.close()
 
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nExiting. Goodbye!")
+
 
