@@ -1,6 +1,9 @@
+
+
 # Secrets
 .env
 .env.*
+!.env.example
 
 # Virtualenv
 .venv/
@@ -14,4 +17,8 @@ __pycache__/
 
 # Project outputs
 outputs/
+
+# Ignore all zips except the curated sample
+*.zip
+!sample_outputs.zip
 
