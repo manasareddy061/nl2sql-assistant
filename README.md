@@ -111,12 +111,9 @@ python3 test_key.py
 **Chinook_Sqlite.sqlite not found**  
 Ensure you copied the DB into the project root:
 ~~~bash
-cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite .
+cp chinook-database/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite
 ~~~
 
-**no such table: ...**  
-Use exact Chinook table names (singular, capitalized):  
-`Customer`, `Invoice`, `InvoiceLine`, `Track`, etc.
 
 ---
 
