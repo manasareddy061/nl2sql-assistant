@@ -2,7 +2,7 @@
 
 A Python-based assistant that converts **natural language questions into SQL queries** and runs them on the classic Chinook SQLite database — powered by OpenAI GPT models.
 
-This project demonstrates **Agentic AI + LLMs** for database query automation. Perfect for showcasing **Data Engineering, AI/ML, and LLM integration skills**.
+This project demonstrates **Agentic AI + LLMs** for database query automation.
 
 ---
 
