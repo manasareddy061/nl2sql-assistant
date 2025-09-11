@@ -1,19 +1,67 @@
 # app.py
+import os
+import hashlib
+import urllib.request
 import sqlite3
 import pandas as pd
 import streamlit as st
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Reuse your functions/constants from the CLI module
+# Reuse functions/constants from CLI module (NOTE: no DB_PATH import here)
 from nl2sql import (
-    DB_PATH, MODEL, MAX_HISTORY_TURNS,
+    MODEL, MAX_HISTORY_TURNS,
     get_schema, schema_as_text,
     build_history_context, llm_sql, is_safe_select,
     run_query, explain_results, export_run, slugify
 )
 
 load_dotenv()
+
+# --- runtime DB bootstrap (no DB in git) ------------------------------------
+BASE_DIR = Path(__file__).resolve().parent
+DEFAULT_DBNAME = "Chinook_Sqlite.sqlite"
+
+# Config via env/secrets
+DB_URL = os.environ.get("DB_URL", "").strip()  # e.g., https://.../Chinook_Sqlite.sqlite
+# allow overriding path; default to app directory
+DB_PATH = Path(os.environ.get("DB_PATH", str(BASE_DIR / DEFAULT_DBNAME)))
+DB_SHA256 = os.environ.get("DB_SHA256", "").lower().strip()  # optional
+
+def _sha256(p: Path) -> str:
+    h = hashlib.sha256()
+    with open(p, "rb") as f:
+        for chunk in iter(lambda: f.read(1024 * 1024), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+def ensure_db_present():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    # If already present, verify (when checksum provided) and reuse
+    if DB_PATH.exists():
+        if DB_SHA256 and _sha256(DB_PATH) != DB_SHA256:
+            DB_PATH.unlink(missing_ok=True)
+        else:
+            return
+    # Need a source to download from
+    if not DB_URL:
+        st.error("Database not found and DB_URL is not set. Add DB_URL (and optional DB_SHA256) in deployment secrets.")
+        st.stop()
+    # Download
+    try:
+        urllib.request.urlretrieve(DB_URL, DB_PATH)
+    except Exception as e:
+        st.error(f"Could not download database from DB_URL. Error: {e}")
+        st.stop()
+    # Verify integrity if checksum provided
+    if DB_SHA256 and _sha256(DB_PATH) != DB_SHA256:
+        DB_PATH.unlink(missing_ok=True)
+        st.error("Downloaded DB failed checksum verification. Check DB_URL/DB_SHA256.")
+        st.stop()
+
+ensure_db_present()
+# -----------------------------------------------------------------------------
+
 
 st.set_page_config(page_title="NL2SQL Assistant", page_icon="🧠", layout="wide")
 st.title("🧠 NL2SQL Assistant")
@@ -31,11 +79,13 @@ with st.sidebar:
     # Lazy-load schema once
     if "schema_txt" not in st.session_state:
         if db_ok:
-            conn = sqlite3.connect(DB_PATH)
-            with conn:
-                schema = get_schema(conn)
-            st.session_state.schema_txt = schema_as_text(schema)
-            conn.close()
+            conn = sqlite3.connect(str(DB_PATH), check_same_thread=False)
+            try:
+                with conn:
+                    schema = get_schema(conn)
+                st.session_state.schema_txt = schema_as_text(schema)
+            finally:
+                conn.close()
         else:
             st.session_state.schema_txt = "(DB not found)"
 
@@ -52,10 +102,10 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 if "conn" not in st.session_state and Path(DB_PATH).exists():
-    st.session_state.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+    st.session_state.conn = sqlite3.connect(str(DB_PATH), check_same_thread=False)
 
 # --- Main input area ---
-col_q, col_btn = st.columns([5,1])
+col_q, col_btn = st.columns([5, 1])
 with col_q:
     question = st.text_input("Ask a question", placeholder="e.g., Top 5 countries by revenue")
 with col_btn:
@@ -132,4 +182,3 @@ else:
             if h.get("preview"):
                 st.caption("Preview rows")
                 st.write(pd.DataFrame(h["preview"]))
-
