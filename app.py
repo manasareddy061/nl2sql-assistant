@@ -1,67 +1,19 @@
 # app.py
-import os
-import hashlib
-import urllib.request
 import sqlite3
 import pandas as pd
 import streamlit as st
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Reuse functions/constants from CLI module (NOTE: no DB_PATH import here)
+# Reuse your functions/constants from the CLI module
 from nl2sql import (
-    MODEL, MAX_HISTORY_TURNS,
+    DB_PATH, MODEL, MAX_HISTORY_TURNS,
     get_schema, schema_as_text,
     build_history_context, llm_sql, is_safe_select,
     run_query, explain_results, export_run, slugify
 )
 
 load_dotenv()
-
-# --- runtime DB bootstrap (no DB in git) ------------------------------------
-BASE_DIR = Path(__file__).resolve().parent
-DEFAULT_DBNAME = "Chinook_Sqlite.sqlite"
-
-# Config via env/secrets
-DB_URL = os.environ.get("DB_URL", "").strip()  # e.g., https://.../Chinook_Sqlite.sqlite
-# allow overriding path; default to app directory
-DB_PATH = Path(os.environ.get("DB_PATH", str(BASE_DIR / DEFAULT_DBNAME)))
-DB_SHA256 = os.environ.get("DB_SHA256", "").lower().strip()  # optional
-
-def _sha256(p: Path) -> str:
-    h = hashlib.sha256()
-    with open(p, "rb") as f:
-        for chunk in iter(lambda: f.read(1024 * 1024), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-def ensure_db_present():
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    # If already present, verify (when checksum provided) and reuse
-    if DB_PATH.exists():
-        if DB_SHA256 and _sha256(DB_PATH) != DB_SHA256:
-            DB_PATH.unlink(missing_ok=True)
-        else:
-            return
-    # Need a source to download from
-    if not DB_URL:
-        st.error("Database not found and DB_URL is not set. Add DB_URL (and optional DB_SHA256) in deployment secrets.")
-        st.stop()
-    # Download
-    try:
-        urllib.request.urlretrieve(DB_URL, DB_PATH)
-    except Exception as e:
-        st.error(f"Could not download database from DB_URL. Error: {e}")
-        st.stop()
-    # Verify integrity if checksum provided
-    if DB_SHA256 and _sha256(DB_PATH) != DB_SHA256:
-        DB_PATH.unlink(missing_ok=True)
-        st.error("Downloaded DB failed checksum verification. Check DB_URL/DB_SHA256.")
-        st.stop()
-
-ensure_db_present()
-# -----------------------------------------------------------------------------
-
 
 st.set_page_config(page_title="NL2SQL Assistant", page_icon="🧠", layout="wide")
 st.title("🧠 NL2SQL Assistant")
@@ -79,13 +31,11 @@ with st.sidebar:
     # Lazy-load schema once
     if "schema_txt" not in st.session_state:
         if db_ok:
-            conn = sqlite3.connect(str(DB_PATH), check_same_thread=False)
-            try:
-                with conn:
-                    schema = get_schema(conn)
-                st.session_state.schema_txt = schema_as_text(schema)
-            finally:
-                conn.close()
+            conn = sqlite3.connect(DB_PATH)
+            with conn:
+                schema = get_schema(conn)
+            st.session_state.schema_txt = schema_as_text(schema)
+            conn.close()
         else:
             st.session_state.schema_txt = "(DB not found)"
 
@@ -102,15 +52,16 @@ if "history" not in st.session_state:
     st.session_state.history = []
 
 if "conn" not in st.session_state and Path(DB_PATH).exists():
-    st.session_state.conn = sqlite3.connect(str(DB_PATH), check_same_thread=False)
+    st.session_state.conn = sqlite3.connect(DB_PATH, check_same_thread=False)
 
 # --- Main input area ---
-col_q, col_btn = st.columns([5, 1])
+col_q, col_btn = st.columns([5,1])
 with col_q:
     question = st.text_input("Ask a question", placeholder="e.g., Top 5 countries by revenue")
 with col_btn:
     run_clicked = st.button("Run", use_container_width=True)
 
+    
 # --- Handle query run ---
 if run_clicked:
     if not question.strip():
@@ -120,18 +71,18 @@ if run_clicked:
     else:
         # Build history context
         hist_ctx = build_history_context(st.session_state.history[-max_hist:] if max_hist else [])
-
+    
         # LLM -> SQL
         try:
             sql = llm_sql(question.strip(), st.session_state.schema_txt, hist_ctx)
         except Exception as e:
             st.error(f"Failed to generate SQL: {e}")
             sql = ""
-
+        
         if sql:
             st.subheader("Generated SQL")
             st.code(sql, language="sql")
-
+            
             # Safety check
             if not is_safe_select(sql):
                 st.error("⚠️ Blocked: not a single safe SELECT statement.")
@@ -145,9 +96,9 @@ if run_clicked:
                     df = None
 
                 if df is not None:
-                    st.subheader("Results")
+                    st.subheader("Results")   
                     st.dataframe(df, use_container_width=True)
-
+        
                     # Explanation
                     try:
                         expl = explain_results(question, sql, rows[:5] if rows else [])
@@ -156,11 +107,11 @@ if run_clicked:
                     if expl:
                         with st.expander("Explanation"):
                             st.write(expl)
-
+            
                     # Update history
                     preview = rows[:3] if rows else []
                     st.session_state.history.append({"q": question, "sql": sql, "preview": preview})
-
+            
                     # Export
                     if export_enabled:
                         try:
@@ -169,7 +120,6 @@ if run_clicked:
                             st.toast("Saved to outputs/ ✅", icon="💾")
                         except Exception as e:
                             st.warning(f"Export failed: {e}")
-
 # --- History panel ---
 st.markdown("---")
 st.subheader("Chat history")
@@ -177,8 +127,8 @@ if not st.session_state.history:
     st.caption("No history yet.")
 else:
     for i, h in enumerate(st.session_state.history[-max_hist:][::-1], 1):
-        with st.expander(f"{i}. {h['q']}", expanded=False):
+        with st.expander(f"{i}. {h['q']}", expanded=False):   
             st.code(h["sql"], language="sql")
-            if h.get("preview"):
+            if h.get("preview"): 
                 st.caption("Preview rows")
                 st.write(pd.DataFrame(h["preview"]))
